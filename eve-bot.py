@@ -43,7 +43,7 @@ import struct
 import sys
 import select
 import collections
-import thread
+import threading
 import threading
 import signal
 import os
@@ -162,7 +162,7 @@ class mumbleConnection(threading.Thread):
         threading.Thread.__init__(self)
         self.plannedPackets=collections.deque()
         tcpSock=socket.socket(type=socket.SOCK_STREAM)
-        self.socketLock=thread.allocate_lock()
+        self.socketLock=threading.allocate_lock()
         self.socket=ssl.wrap_socket(tcpSock,ssl_version=ssl.PROTOCOL_TLSv1)
         self.socket.setsockopt(socket.SOL_TCP,socket.TCP_NODELAY,1)
         self.host=host
@@ -195,7 +195,7 @@ class mumbleConnection(threading.Thread):
             elif ((v & 0xFC) == 0xF4):
                 return (ord(m[si+1]) << 56 | ord(m[si+2]) << 48 | ord(m[si+3]) << 40 | ord(m[si+4]) << 32 | ord(m[si+5]) << 24 | ord(m[si+6]) << 16 | ord(m[si+7]) << 8 | ord(m[si+8]),9)
             elif ((v & 0xFC) == 0xF8):
-                result,length=decodePDSInt(m,si+1)
+                result,length = "decodePDSInt" (m,si+1)
                 return(-result,length+1)
             elif ((v & 0xFC) == 0xFC):
                 return (-(v & 0x03),1)

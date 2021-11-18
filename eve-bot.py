@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 #
 #Copyright (c) 2014, Derek Barnett <derek@skyehaven.net>
 #Copyright (c) 2009-2014, Philip Cass <frymaster@127001.org>
@@ -77,7 +77,7 @@ for i in messageLookupMessage.keys():
 
 
 def discontinue_processing(signl, frme):
-    print time.strftime("%a, %d %b %Y %H:%M:%S +0000"), "Received shutdown notice"
+    print; time.strftime("%a, %d %b %Y %H:%M:%S +0000"), "Received shutdown notice"
     if eavesdropper:
         eavesdropper.wrapUpThread(True)
     else:
@@ -149,7 +149,7 @@ class timedWatcher(threading.Thread):
                 sleeptime = altsleeptime
             if sleeptime > 0:
                 time.sleep(sleeptime)
-        print time.strftime("%a, %d %b %Y %H:%M:%S +0000"),self.threadName,"timed thread going away"
+        print; time.strftime("%a, %d %b %Y %H:%M:%S +0000"),self.threadName,"timed thread going away"
 
 
 
@@ -200,14 +200,14 @@ class mumbleConnection(threading.Thread):
             elif ((v & 0xFC) == 0xFC):
                 return (-(v & 0x03),1)
             else:
-                print time.strftime("%a, %d %b %Y %H:%M:%S +0000"),"Help Help, out of cheese :("
+                print; time.strftime("%a, %d %b %Y %H:%M:%S +0000"),"Help Help, out of cheese :("
                 sys.exit(1)
         elif ((v & 0xF0) == 0xE0):
             return ((v & 0x0F) << 24 | ord(m[si+1]) << 16 | ord(m[si+2]) << 8 | ord(m[si+3]),4)
         elif ((v & 0xE0) == 0xC0):
             return ((v & 0x1F) << 16 | ord(m[si+1]) << 8 | ord(m[si+2]),3)
         else:
-            print time.strftime("%a, %d %b %Y %H:%M:%S +0000"),"out of cheese?"
+            print; time.strftime("%a, %d %b %Y %H:%M:%S +0000"),"out of cheese?"
             sys.exit(1)
 
     def packageMessageForSending(self,msgType,stringMessage):
@@ -219,7 +219,7 @@ class mumbleConnection(threading.Thread):
         while len(message)>0:
             sent=self.socket.send(message)
             if sent < 0:
-                print time.strftime("%a, %d %b %Y %H:%M:%S +0000"),self.threadName,"Server socket error while trying to write, immediate abort"
+                print; time.strftime("%a, %d %b %Y %H:%M:%S +0000"),self.threadName,"Server socket error while trying to write, immediate abort"
                 self.socketLock.release()
                 return False
             message=message[sent:]
@@ -232,7 +232,7 @@ class mumbleConnection(threading.Thread):
             received=self.socket.recv(size-len(message))
             message+=received
             if len(received)==0:
-                print time.strftime("%a, %d %b %Y %H:%M:%S +0000"),self.threadName,"Server socket died while trying to read, immediate abort"
+                print; time.strftime("%a, %d %b %Y %H:%M:%S +0000"),self.threadName,"Server socket died while trying to read, immediate abort"
                 return None
         return message
 
@@ -316,7 +316,7 @@ class mumbleConnection(threading.Thread):
         self.mimicList[session]["setClose"]=mimic.setClose
         self.mimicList[session]["thread"]=mimic
         self.mimicList[session]["getClose"]=mimic.getClose
-        print time.strftime("%a, %d %b %Y %H:%M:%S +0000"),self.threadName,"started mimic",mimicNick,"thread",mimic.threadName
+        print; time.strftime("%a, %d %b %Y %H:%M:%S +0000"),self.threadName,"started mimic",mimicNick,"thread",mimic.threadName
         mimic.start()
 
     def wrapUpThread(self,killChildrenImmediately=False):
@@ -354,7 +354,7 @@ class mumbleConnection(threading.Thread):
         if msgType==8 and self.session!=None:
             message=self.parseMessage(msgType,stringMessage)
             if message.session==self.session:
-                print time.strftime("%a, %d %b %Y %H:%M:%S +0000"),self.threadName,"********* KICKED ***********"
+                print; time.strftime("%a, %d %b %Y %H:%M:%S +0000"),self.threadName,"********* KICKED ***********"
                 #Should mimics leave immediately if Eve is kicked?  A matter of opinion... currently they only do so upon signal or fatal error
                 self.wrapUpThread(False)
                 return
@@ -403,18 +403,18 @@ class mumbleConnection(threading.Thread):
         if msgType!=1 and self.verbose:
             try:
               message=self.parseMessage(msgType,stringMessage)
-              print str(type(message)),message
+              print; str(type(message)),message
             except KeyError:
-              print "Ignoring unknown message of type " + str(msgType)
+              print; "Ignoring unknown message of type " + str(msgType)
 
 
     def run(self):
         try:
             self.socket.connect(self.host)
         except:
-            print time.strftime("%a, %d %b %Y %H:%M:%S +0000"),self.threadName,"Couldn't connect to server"
+            print; time.strftime("%a, %d %b %Y %H:%M:%S +0000"),self.threadName,"Couldn't connect to server"
             return
-        print time.strftime("%a, %d %b %Y %H:%M:%S +0000"),self.threadName,"connected to server"
+        print; time.strftime("%a, %d %b %Y %H:%M:%S +0000"),self.threadName,"connected to server"
         pbMess = Mumble_pb2.Version()
         pbMess.release="1.2.5"
         #pbMess.version=66048
@@ -446,7 +446,7 @@ class mumbleConnection(threading.Thread):
 
         self.timedWatcher = timedWatcher(self.plannedPackets,self.socketLock,self.socket)
         self.timedWatcher.start()
-        print time.strftime("%a, %d %b %Y %H:%M:%S +0000"),self.threadName,"started timed watcher",self.timedWatcher.threadName
+        print; time.strftime("%a, %d %b %Y %H:%M:%S +0000"),self.threadName,"started timed watcher",self.timedWatcher.threadName
 
         while True:
             pollList,foo,errList=select.select([sockFD],[],[sockFD])
@@ -462,11 +462,11 @@ class mumbleConnection(threading.Thread):
             self.timedWatcher.stopRunning()
 
         self.socket.close()
-        print time.strftime("%a, %d %b %Y %H:%M:%S +0000"),self.threadName,"waiting for timed watcher to die..."
+        print; time.strftime("%a, %d %b %Y %H:%M:%S +0000"),self.threadName,"waiting for timed watcher to die..."
         if self.timedWatcher!=None:
             while self.timedWatcher.isAlive():
                 pass
-        print time.strftime("%a, %d %b %Y %H:%M:%S +0000"),self.threadName,"thread going away -",self.nickname
+        print; time.strftime("%a, %d %b %Y %H:%M:%S +0000"),self.threadName,"thread going away -",self.nickname
 
 def main():
     global eavesdropper,warning
@@ -487,21 +487,21 @@ def main():
     p.add_option("--password",help="Password for server, if any",action="store",type="string")
 
     if len(warning)>0:
-        print warning
+        print; warning
     o, arguments = p.parse_args()
     if len(warning)>0:
         sys.exit(1)
 
     if o.relay_to==None or o.eavesdrop_in==None:
         p.print_help()
-        print "\nYou MUST include both an eavesdrop channel to listen to, and a relay channel to relay to"
+        print; "\nYou MUST include both an eavesdrop channel to listen to, and a relay channel to relay to"
         sys.exit(1)
 
     host=(o.server,o.port)
 
     if o.eavesdrop_in=="Root":
         p.print_help()
-        print "\nEavesdrop channel cannot be root (or it would briefly attempt to mimic everyone who joined - including mimics)"
+        print; "\nEavesdrop channel cannot be root (or it would briefly attempt to mimic everyone who joined - including mimics)"
         sys.exit(1)
 
     eavesdropper = mumbleConnection(host,o.nick,o.eavesdrop_in,mimicPrefix=o.mimic_prefix,mimicChannel=o.relay_to,relayDelay=o.delay,password=o.password,verbose=o.verbose)
